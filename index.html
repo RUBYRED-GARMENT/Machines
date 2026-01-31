@@ -16,9 +16,23 @@
         }
         body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; transition: 0.3s; }
         .container { max-width: 1200px; margin: auto; }
-        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; position: relative; }
         .brand { font-weight: 800; font-size: 1.5rem; color:white; letter-spacing: 1px; }
         
+        /* تصميم اللوجو للكمبيوتر */
+        .logo img {
+            height: 55px; width: 55px;
+            animation: spin 4s linear infinite;
+            transform-origin: center center;
+            display: block;
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* إخفاء اللوجو في الموبايل */
+        @media (max-width: 768px) {
+            .logo { display: none !important; }
+        }
+
         .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 15px; }
         .stat-box { background: var(--card); padding: 12px; border-radius: 12px; border: 1px solid var(--border); text-align: center; cursor: pointer; transition: 0.2s; }
         .stat-box h3 { margin: 0; font-size: 1.2rem; }
@@ -36,7 +50,7 @@
         @keyframes pulseGlow { 0% { box-shadow: 0 0 2px rgba(220, 38, 38, 0.4); } 50% { box-shadow: 0 0 15px rgba(220, 38, 38, 0.7); } 100% { box-shadow: 0 0 2px rgba(220, 38, 38, 0.4); } }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
-        .machine-card { background: var(--card); border-radius: 15px; padding: 15px; border: 1px solid var(--border); transition: 0.3s; cursor: pointer; }
+        .machine-card { background: var(--card); border-radius: 15px; padding: 15px; border: 1px solid var(--border); transition: 0.3s; cursor: pointer; position: relative; }
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         
         .card-body { display: none; margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border); }
@@ -54,48 +68,6 @@
         .whatsapp-btn { margin-top: 15px; background: var(--whatsapp); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; width: 100%; font-family: 'Cairo'; }
         .detail-item { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .detail-label { color: var(--muted); }
-            .logo img {
-      height: 55px;
-      width: 55px;
-      position:absolute;
-      left: 735px;
-        top: 20px;
-
-      /* ===== FIX: PURE SELF ROTATION ===== */
-      animation: spin 4s linear infinite;
-      transform-origin: center center !important;
-      display: block;
-    }
-        @keyframes spin {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-
-
-     @media (max-width: 768px) {
-     .logo img {
-        transform-origin: center center !important;
-         display:none;
-      }
-      .logo {
-        position: fixed;
-        left: 55%;
-        top: 20px;
-        transform: translateX(-50%);
-        display:none;
-
-      }
-      .logo img {
-        height: 50px;
-        width: 50px;
-        position: fixed;
-        left: 0;
-        top: 0;
-        transform: translateX(-50%);
-          display:none;
-      }
-    }
-
     </style>
 </head>
 <body>
@@ -103,9 +75,8 @@
 <div class="container">
     <header class="top-nav">
         <div class="brand">RUBY<span style="color:red">RED</span> MACHINES</div>
- <div class="logo">
-        <img src="pic/logooo.png" alt="rubyred" />
-      </div>        <select id="langSelect" onchange="changeLang(this.value)" style="cursor: pointer">
+        <div class="logo"><img src="pic/logooo.png" alt="rubyred" /></div>
+        <select id="langSelect" onchange="changeLang(this.value)" style="cursor: pointer">
             <option value="en">English</option>
             <option value="ar">العربية</option>
             <option value="tr">Türkçe</option>
@@ -139,27 +110,9 @@
     let currentTypeFilter = 'all';
 
     const dictionary = {
-        en: {
-            total: "Total", active: "Active", repair: "Repair", singer: "Singer", over: "Over", orlay: "Orlay",
-            search: "Search code...", btnReport: "Send Maintenance Report",
-            daysLeft: "{n} Days left", daysLate: "{n} Days late", today: "Today",
-            optAll: "Maintenance: All", optUrgent: "Urgent 🚨", optSoon: "Soon", optSafe: "Safe",
-            waTitle: "🚨 *MAINTENANCE REQUEST*", waCode: "Code", waLoc: "Location", waModel: "Model", waType: "Type", waLast: "Last Service"
-        },
-        ar: {
-            total: "الإجمالي", active: "يعمل", repair: "أعطال", singer: "سنجر", over: "أوفر", orlay: "أورليه",
-            search: "بحث عن كود...", btnReport: "إرسال بلاغ صيانة",
-            daysLeft: "باقي {n} يوم", daysLate: "متأخر {n} يوم", today: "موعد اليوم",
-            optAll: "المواعيد: الكل", optUrgent: "عاجل 🚨", optSoon: "قريباً", optSafe: "آمن",
-            waTitle: "🚨 *بلاغ صيانة فنية*", waCode: "الكود", waLoc: "الموقع", waModel: "الموديل", waType: "النوع", waLast: "آخر صيانة"
-        },
-        tr: {
-            total: "Toplam", active: "Aktif", repair: "Arıza", singer: "Singer", over: "Over", orlay: "Orlay",
-            search: "Kod ara...", btnReport: "Bakım Raporu Gönder",
-            daysLeft: "{n} gün kaldı", daysLate: "{n} gün gecikti", today: "Bugün",
-            optAll: "Tümü", optUrgent: "Acil 🚨", optSoon: "Yakında", optSafe: "Güvenli",
-            waTitle: "🚨 *BAKIM TALEBİ*", waCode: "Kod", waLoc: "Konum", waModel: "Model", waType: "Tip", waLast: "Son Bakım"
-        }
+        en: { total: "Total", active: "Active", repair: "Repair", singer: "Singer", over: "Over", orlay: "Orlay", search: "Search code...", btnReport: "Send Maintenance Report", daysLeft: "{n} Days left", daysLate: "{n} Days late", today: "Today", optAll: "Maintenance: All", optUrgent: "Urgent 🚨", optSoon: "Soon", optSafe: "Safe", waTitle: "🚨 *MAINTENANCE REQUEST*", waCode: "Code", waLoc: "Location", waModel: "Model", waType: "Type", waLast: "Last Service" },
+        ar: { total: "الإجمالي", active: "يعمل", repair: "أعطال", singer: "سنجر", over: "أوفر", orlay: "أورليه", search: "بحث عن كود...", btnReport: "إرسال بلاغ صيانة", daysLeft: "باقي {n} يوم", daysLate: "متأخر {n} يوم", today: "موعد اليوم", optAll: "المواعيد: الكل", optUrgent: "عاجل 🚨", optSoon: "قريباً", optSafe: "آمن", waTitle: "🚨 *بلاغ صيانة فنية*", waCode: "الكود", waLoc: "الموقع", waModel: "الموديل", waType: "النوع", waLast: "آخر صيانة" },
+        tr: { total: "Toplam", active: "Aktif", repair: "Arıza", singer: "Singer", over: "Over", orlay: "Orlay", search: "Kod ara...", btnReport: "Bakım Raporu Gönder", daysLeft: "{n} gün kaldı", daysLate: "{n} gün gecikti", today: "Bugün", optAll: "Tümü", optUrgent: "Acil 🚨", optSoon: "Yakında", optSafe: "Güvenli", waTitle: "🚨 *BAKIM TALEBİ*", waCode: "Kod", waLoc: "Konum", waModel: "Model", waType: "Tip", waLast: "Son Bakım" }
     };
 
     async function init() {
@@ -178,7 +131,6 @@
             if (codeFromURL) {
                 document.getElementById('searchInput').value = codeFromURL;
             }
-
             updateUI();
         } catch (e) { console.error("Load Error"); }
     }
@@ -191,13 +143,12 @@
     }
 
     function translate(key, n) {
-        let text = (dictionary[currentLang] && dictionary[currentLang][key]) ? dictionary[currentLang][key] : key;
+        let text = dictionary[currentLang][key] || key;
         return n !== undefined ? text.replace('{n}', Math.abs(n)) : text;
     }
 
     function resetAllFilters() {
-        currentStatusFilter = 'all';
-        currentTypeFilter = 'all';
+        currentStatusFilter = 'all'; currentTypeFilter = 'all';
         document.getElementById('searchInput').value = '';
         document.getElementById('maintFilter').value = 'all';
         updateUI();
@@ -205,41 +156,34 @@
 
     function updateUI() {
         const statsStatus = document.getElementById('statusStats');
-        statsStatus.innerHTML = `
-            <div class="stat-box ${currentStatusFilter==='all' && currentTypeFilter==='all'?'active-filter':''}" onclick="resetAllFilters()"><h3>${allMachines.length}</h3><p>${translate('total')}</p></div>
-            <div class="stat-box ${currentStatusFilter==='active'?'active-filter':''}" style="border-bottom:4px solid var(--green)" onclick="setStatusFilter('active')"><h3>${allMachines.filter(m=>m.Status?.toLowerCase()==='active').length}</h3><p>${translate('active')}</p></div>
-            <div class="stat-box ${currentStatusFilter==='repair'?'active-filter':''}" style="border-bottom:4px solid var(--red)" onclick="setStatusFilter('repair')"><h3>${allMachines.filter(m=>m.Status?.toLowerCase()!=='active').length}</h3><p>${translate('repair')}</p></div>
-        `;
+        statsStatus.innerHTML = `<div class="stat-box ${currentStatusFilter==='all' && currentTypeFilter==='all'?'active-filter':''}" onclick="resetAllFilters()"><h3>${allMachines.length}</h3><p>${translate('total')}</p></div><div class="stat-box ${currentStatusFilter==='active'?'active-filter':''}" style="border-bottom:4px solid var(--green)" onclick="setStatusFilter('active')"><h3>${allMachines.filter(m=>m.Status?.toLowerCase()==='active').length}</h3><p>${translate('active')}</p></div><div class="stat-box ${currentStatusFilter==='repair'?'active-filter':''}" style="border-bottom:4px solid var(--red)" onclick="setStatusFilter('repair')"><h3>${allMachines.filter(m=>m.Status?.toLowerCase()!=='active').length}</h3><p>${translate('repair')}</p></div>`;
 
         const statsType = document.getElementById('typeStats');
-        statsType.innerHTML = `
-            <div class="stat-box type-singer ${currentTypeFilter==='Singer'?'active-filter':''}" onclick="setTypeFilter('Singer')"><h3>${allMachines.filter(m=>m.Type?.toLowerCase().includes('singer')).length}</h3><p>${translate('singer')}</p></div>
-            <div class="stat-box type-over ${currentTypeFilter==='Over'?'active-filter':''}" onclick="setTypeFilter('Over')"><h3>${allMachines.filter(m=>m.Type?.toLowerCase().includes('over')).length}</h3><p>${translate('over')}</p></div>
-            <div class="stat-box type-orlay ${currentTypeFilter==='Orlay'?'active-filter':''}" onclick="setTypeFilter('Orlay')"><h3>${allMachines.filter(m=>m.Type?.toLowerCase().includes('orlay')).length}</h3><p>${translate('orlay')}</p></div>
-        `;
-
-        document.getElementById('searchInput').placeholder = translate('search');
-        document.getElementById('optAll').innerText = translate('optAll');
-        document.getElementById('optUrgent').innerText = translate('optUrgent');
-        document.getElementById('optSoon').innerText = translate('optSoon');
-        document.getElementById('optSafe').innerText = translate('optSafe');
+        statsType.innerHTML = `<div class="stat-box type-singer ${currentTypeFilter==='Singer'?'active-filter':''}" onclick="setTypeFilter('Singer')"><h3>${allMachines.filter(m=>m.Type?.toLowerCase().includes('singer')).length}</h3><p>${translate('singer')}</p></div><div class="stat-box type-over ${currentTypeFilter==='Over'?'active-filter':''}" onclick="setTypeFilter('Over')"><h3>${allMachines.filter(m=>m.Type?.toLowerCase().includes('over')).length}</h3><p>${translate('over')}</p></div><div class="stat-box type-orlay ${currentTypeFilter==='Orlay'?'active-filter':''}" onclick="setTypeFilter('Orlay')"><h3>${allMachines.filter(m=>m.Type?.toLowerCase().includes('orlay')).length}</h3><p>${translate('orlay')}</p></div>`;
 
         filterData();
     }
 
     function filterData() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
         const maintF = document.getElementById('maintFilter').value;
         const grid = document.getElementById('machinesGrid');
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const codeFromURL = urlParams.get('code')?.toLowerCase().trim();
+
         grid.innerHTML = "";
 
         allMachines.forEach(m => {
+            const mCode = m.Code?.toLowerCase().trim();
             const mStat = (m.Status || "").toLowerCase();
             const mType = (m.Type || "").toLowerCase();
             const diff = getDaysDiff(m["Next Maintenance"]);
             let mState = (diff !== null && diff <= 7) ? 'urgent' : (diff !== null && diff <= 15 ? 'soon' : 'safe');
 
-            const matchesSearch = m.Code?.toLowerCase().includes(query);
+            // منطق البحث المحدث: مطابقة تامة للسكان، مرنة للكتابة اليدوية
+            let matchesSearch = (codeFromURL && query === codeFromURL) ? (mCode === query) : (mCode.includes(query));
+
             const matchesStatus = currentStatusFilter === 'all' || (currentStatusFilter === 'active' && mStat === 'active') || (currentStatusFilter === 'repair' && mStat !== 'active');
             const matchesType = currentTypeFilter === 'all' || mType.includes(currentTypeFilter.toLowerCase());
             const matchesMaint = maintF === 'all' || mState === maintF;
@@ -248,7 +192,8 @@
                 const card = document.createElement('div');
                 card.className = `machine-card ${mState === 'urgent' ? 'card-urgent' : ''}`;
                 
-                if(query !== '' && m.Code.toLowerCase() === query) card.classList.add('expanded');
+                // فتح الكارت تلقائياً في حالة المطابقة التامة (QR)
+                if(query !== '' && mCode === query) card.classList.add('expanded');
                 
                 card.onclick = (e) => { if(!e.target.closest('button')) card.classList.toggle('expanded'); };
                 
@@ -280,24 +225,14 @@
 
     function sendWA(machine) {
         const t = dictionary[currentLang];
-        const text = `${t.waTitle}%0A%0A` +
-                     `🆔 *${t.waCode}:* ${machine.Code}%0A` +
-                     `📍 *${t.waLoc}:* ${machine.Location || '-'}%0A` +
-                     `📦 *${t.waModel}:* ${machine.Model || '-'}%0A` +
-                     `⚙️ *${t.waType}:* ${machine.Type || '-'}%0A` +
-                     `📅 *${t.waLast}:* ${machine["Last Maintenance"] || '-'}`;
+        const text = `${t.waTitle}%0A%0A🆔 *${t.waCode}:* ${machine.Code}%0A📍 *${t.waLoc}:* ${machine.Location || '-'}%0A📦 *${t.waModel}:* ${machine.Model || '-'}%0A⚙️ *${t.waType}:* ${machine.Type || '-'}%0A📅 *${t.waLast}:* ${machine["Last Maintenance"] || '-'}`;
         window.open(`https://wa.me/${MAINTENANCE_PHONE}?text=${text}`, '_blank');
     }
 
     function setStatusFilter(s) { currentStatusFilter = s; updateUI(); }
     function setTypeFilter(t) { currentTypeFilter = currentTypeFilter === t ? 'all' : t; updateUI(); }
     function changeLang(l) { currentLang = l; document.getElementById('htmlPage').dir = l === 'ar' ? 'rtl' : 'ltr'; updateUI(); }
-
     window.onload = init;
 </script>
 </body>
-
 </html>
-
-
-
