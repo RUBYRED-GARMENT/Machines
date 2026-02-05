@@ -73,11 +73,9 @@
 
     <div class="controls">
         <input type="text" id="searchInput" style="flex:2" placeholder="Search code..." onkeyup="filterData()">
-        
         <select id="lineFilter" onchange="filterData()">
             <option value="all">All Lines / كل الخطوط</option>
         </select>
-
         <select id="maintFilter" onchange="filterData()">
             <option value="all" id="optAll">Maintenance: All</option>
             <option value="urgent" id="optUrgent">Urgent 🚨</option>
@@ -123,6 +121,14 @@
                 let obj = {}; headers.forEach((h, i) => obj[h] = row[i]?.trim());
                 return obj;
             }).filter(m => m.Code);
+
+            // التقاط الكود من الرابط URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const codeFromURL = urlParams.get('code');
+            if (codeFromURL) {
+                document.getElementById('searchInput').value = codeFromURL;
+            }
+
             updateUI();
         } catch (e) { console.error("Load Error"); }
     }
@@ -149,14 +155,12 @@
 
     function updateUI() {
         const statsStatus = document.getElementById('statusStats');
-        // حساب الأعداد بناءً على الحالة
-        const total = allMachines.length;
         const activeCount = allMachines.filter(m => m.Status?.toLowerCase() === 'active').length;
-        const repairCount = allMachines.filter(m => m.Status?.toLowerCase() === 'repair' || m.Status?.toLowerCase() === 'down').length;
+        const repairCount = allMachines.filter(m => ['repair', 'down'].includes(m.Status?.toLowerCase())).length;
         const stockCount = allMachines.filter(m => m.Status?.toLowerCase() === 'stock').length;
 
         statsStatus.innerHTML = `
-            <div class="stat-box ${currentStatusFilter==='all'?'active-filter':''}" onclick="resetAllFilters()"><h3>${total}</h3><p>${translate('total')}</p></div>
+            <div class="stat-box ${currentStatusFilter==='all'?'active-filter':''}" onclick="resetAllFilters()"><h3>${allMachines.length}</h3><p>${translate('total')}</p></div>
             <div class="stat-box ${currentStatusFilter==='active'?'active-filter':''}" style="border-bottom:4px solid var(--green)" onclick="setStatusFilter('active')"><h3>${activeCount}</h3><p>${translate('active')}</p></div>
             <div class="stat-box ${currentStatusFilter==='repair'?'active-filter':''}" style="border-bottom:4px solid var(--red)" onclick="setStatusFilter('repair')"><h3>${repairCount}</h3><p>${translate('repair')}</p></div>
             <div class="stat-box ${currentStatusFilter==='stock'?'active-filter':''}" style="border-bottom:4px solid var(--stock)" onclick="setStatusFilter('stock')"><h3>${stockCount}</h3><p>${translate('stock')}</p></div>
@@ -168,7 +172,6 @@
             <div class="stat-box ${currentTypeFilter==='Over'?'active-filter':''}" style="border-bottom:4px solid var(--over)" onclick="setTypeFilter('Over')"><h3>${allMachines.filter(m=>m.Type?.toLowerCase().includes('over')).length}</h3><p>${translate('over')}</p></div>
             <div class="stat-box ${currentTypeFilter==='Orlay'?'active-filter':''}" style="border-bottom:4px solid var(--orlay)" onclick="setTypeFilter('Orlay')"><h3>${allMachines.filter(m=>m.Type?.toLowerCase().includes('orlay')).length}</h3><p>${translate('orlay')}</p></div>
         `;
-
         filterData();
     }
 
@@ -178,6 +181,10 @@
         const lineF = document.getElementById('lineFilter').value;
         const grid = document.getElementById('machinesGrid');
         
+        // التحقق إذا كان الرابط يحتوي على كود
+        const urlParams = new URLSearchParams(window.location.search);
+        const codeFromURL = urlParams.get('code')?.toLowerCase().trim();
+
         grid.innerHTML = "";
 
         allMachines.forEach(m => {
@@ -188,31 +195,31 @@
             const diff = getDaysDiff(m["Next Maintenance"]);
             let mState = (diff !== null && diff <= 7) ? 'urgent' : (diff !== null && diff <= 15 ? 'soon' : 'safe');
 
-            const matchesSearch = mCode.includes(query);
-            
-            // فلتر الحالة المطور (Active, Repair, Stock)
-            let matchesStatus = currentStatusFilter === 'all';
-            if (currentStatusFilter === 'active') matchesStatus = mStat === 'active';
-            if (currentStatusFilter === 'repair') matchesStatus = (mStat === 'repair' || mStat === 'down');
-            if (currentStatusFilter === 'stock') matchesStatus = mStat === 'stock';
+            // منطق البحث: إذا كان الكود قادم من URL، يجب أن يطابق تماماً. إذا كان بحث يدوي، يطابق جزئياً.
+            let matchesSearch = (codeFromURL && query === codeFromURL) ? (mCode === query) : (mCode.includes(query));
+
+            let matchesStatus = currentStatusFilter === 'all' || 
+                (currentStatusFilter === 'active' && mStat === 'active') || 
+                (currentStatusFilter === 'repair' && ['repair', 'down'].includes(mStat)) || 
+                (currentStatusFilter === 'stock' && mStat === 'stock');
 
             const matchesType = currentTypeFilter === 'all' || mType.includes(currentTypeFilter.toLowerCase());
             const matchesMaint = maintF === 'all' || mState === maintF;
             
-            // حل مشكلة تداخل الأرقام (2 vs 12) باستخدام Regex للتأكد من الرقم المستقل
             let matchesLine = true;
             if (lineF !== 'all') {
-                const lineNum = lineF.match(/\d+/)[0]; // استخراج الرقم من LINE 2
-                const regex = new RegExp(`\\b${lineNum}\\b`); // البحث عن الرقم ككلمة مستقلة
+                const lineNum = lineF.match(/\d+/)[0];
+                const regex = new RegExp(`\\b${lineNum}\\b`);
                 matchesLine = regex.test(mLocation);
             }
 
             if (matchesSearch && matchesStatus && matchesType && matchesMaint && matchesLine) {
                 const card = document.createElement('div');
-                let cardClass = "machine-card";
-                if(mState === 'urgent') cardClass += " card-urgent";
-                card.className = cardClass;
+                card.className = `machine-card ${mState === 'urgent' ? 'card-urgent' : ''}`;
                 
+                // فتح الكارت تلقائياً في حالة المطابقة التامة (QR/URL)
+                if(query !== '' && mCode === query) card.classList.add('expanded');
+
                 card.onclick = (e) => { if(!e.target.closest('button')) card.classList.toggle('expanded'); };
                 
                 let daysTxt = diff === null ? "" : (diff > 0 ? translate('daysLeft', diff) : (diff < 0 ? translate('daysLate', diff) : translate('today')));
@@ -223,9 +230,7 @@
                     if(!['Code','Status','Type'].includes(k)) bodyContent += `<div class="detail-item"><span class="detail-label">${k}:</span><span>${v||'-'}</span></div>`;
                 });
 
-                let statusClass = 'bg-stock';
-                if(mStat === 'active') statusClass = 'bg-active';
-                else if(mStat === 'repair' || mStat === 'down') statusClass = 'bg-repair';
+                let statusClass = mStat === 'active' ? 'bg-active' : (['repair', 'down'].includes(mStat) ? 'bg-repair' : 'bg-stock');
 
                 card.innerHTML = `
                     <div class="card-header">
@@ -247,7 +252,7 @@
     }
 
     function sendWA(machine) {
-        const text = `🚨 *MAINTENANCE REQUEST*%0A%0A🆔 *Code:* ${machine.Code}%0A📍 *Loc:* ${machine.Location || '-'}%0A⚙️ *Type:* ${machine.Type || '-'}`;
+        const text = `🚨 *MAINTENANCE REQUEST*%0A%0A🆔 *Code:* ${machine.Code}%0A📍 *Loc:* ${machine.Location || '-'}`;
         window.open(`https://wa.me/${MAINTENANCE_PHONE}?text=${text}`, '_blank');
     }
 
