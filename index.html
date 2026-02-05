@@ -12,43 +12,27 @@
             --bg: #0f172a; --card: #1e293b; --primary: #d80f0f;
             --text: #f1f5f9; --muted: #94a3b8; --border: #334155;
             --green: #16a34a; --red: #dc2626; --orange: #f59e0b; --whatsapp: #25d366;
-            --singer: #3b82f6; --over: #a855f7; --orlay: #ec4899;
+            --singer: #3b82f6; --over: #a855f7; --orlay: #ec4899; --stock: #64748b;
         }
         body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; transition: 0.3s; }
         .container { max-width: 1200px; margin: auto; }
         .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; position: relative; }
         .brand { font-weight: 800; font-size: 1.5rem; color:white; letter-spacing: 1px; }
         
-        /* تصميم اللوجو للكمبيوتر */
-        .logo img {
-            height: 55px; width: 55px;
-            animation: spin 4s linear infinite;
-            transform-origin: center center;
-            display: block;
-        }
+        .logo img { height: 55px; width: 55px; animation: spin 4s linear infinite; transform-origin: center center; display: block; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* إخفاء اللوجو في الموبايل */
-        @media (max-width: 768px) {
-            .logo { display: none !important; }
-        }
+        @media (max-width: 768px) { .logo { display: none !important; } }
 
-        .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 15px; }
         .stat-box { background: var(--card); padding: 12px; border-radius: 12px; border: 1px solid var(--border); text-align: center; cursor: pointer; transition: 0.2s; }
         .stat-box h3 { margin: 0; font-size: 1.2rem; }
         .stat-box p { margin: 2px 0 0; font-size: 0.75rem; font-weight: 600; }
         .active-filter { border: 2px solid white !important; background: rgba(255,255,255,0.15); box-shadow: 0 0 10px rgba(255,255,255,0.1); }
 
-        .type-singer { border-bottom: 4px solid var(--singer); }
-        .type-over { border-bottom: 4px solid var(--over); }
-        .type-orlay { border-bottom: 4px solid var(--orlay); }
-
         .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        select, input { background: var(--card); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 10px; font-family: 'Cairo'; outline: none; }
+        select, input { background: var(--card); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 10px; font-family: 'Cairo'; outline: none; flex: 1; min-width: 140px; }
         
-        .card-urgent { border: 2px solid var(--red) !important; animation: pulseGlow 2s infinite ease-in-out; }
-        @keyframes pulseGlow { 0% { box-shadow: 0 0 2px rgba(220, 38, 38, 0.4); } 50% { box-shadow: 0 0 15px rgba(220, 38, 38, 0.7); } 100% { box-shadow: 0 0 2px rgba(220, 38, 38, 0.4); } }
-
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
         .machine-card { background: var(--card); border-radius: 15px; padding: 15px; border: 1px solid var(--border); transition: 0.3s; cursor: pointer; position: relative; }
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
@@ -64,6 +48,7 @@
         .status-badge { font-size: 0.65rem; padding: 3px 8px; border-radius: 15px; font-weight: 700; text-transform: uppercase; }
         .bg-active { background: rgba(22, 163, 74, 0.2); color: var(--green); }
         .bg-repair { background: rgba(220, 38, 38, 0.2); color: var(--red); }
+        .bg-stock { background: rgba(100, 116, 139, 0.2); color: var(--stock); }
         
         .whatsapp-btn { margin-top: 15px; background: var(--whatsapp); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; width: 100%; font-family: 'Cairo'; }
         .detail-item { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -76,7 +61,7 @@
     <header class="top-nav">
         <div class="brand">RUBY<span style="color:red">RED</span> MACHINES</div>
         <div class="logo"><img src="pic/logooo.png" alt="rubyred" /></div>
-        <select id="langSelect" onchange="changeLang(this.value)" style="cursor: pointer">
+        <select id="langSelect" onchange="changeLang(this.value)" style="cursor: pointer; flex: none;">
             <option value="en">English</option>
             <option value="ar">العربية</option>
             <option value="tr">Türkçe</option>
@@ -87,9 +72,14 @@
     <div class="stats-container" id="typeStats"></div>
 
     <div class="controls">
-        <input type="text" id="searchInput" style="flex:2" placeholder="Search..." onkeyup="filterData()">
-        <select id="maintFilter" onchange="filterData()" style="flex:1">
-            <option value="all" id="optAll">All</option>
+        <input type="text" id="searchInput" style="flex:2" placeholder="Search code..." onkeyup="filterData()">
+        
+        <select id="lineFilter" onchange="filterData()">
+            <option value="all">All Lines / كل الخطوط</option>
+        </select>
+
+        <select id="maintFilter" onchange="filterData()">
+            <option value="all" id="optAll">Maintenance: All</option>
             <option value="urgent" id="optUrgent">Urgent 🚨</option>
             <option value="soon" id="optSoon">Soon</option>
             <option value="safe" id="optSafe">Safe</option>
@@ -110,12 +100,20 @@
     let currentTypeFilter = 'all';
 
     const dictionary = {
-        en: { total: "Total", active: "Active", repair: "Repair", singer: "Singer", over: "Over", orlay: "Orlay", search: "Search code...", btnReport: "Send Maintenance Report", daysLeft: "{n} Days left", daysLate: "{n} Days late", today: "Today", optAll: "Maintenance: All", optUrgent: "Urgent 🚨", optSoon: "Soon", optSafe: "Safe", waTitle: "🚨 *MAINTENANCE REQUEST*", waCode: "Code", waLoc: "Location", waModel: "Model", waType: "Type", waLast: "Last Service" },
-        ar: { total: "الإجمالي", active: "يعمل", repair: "أعطال", singer: "سنجر", over: "أوفر", orlay: "أورليه", search: "بحث عن كود...", btnReport: "إرسال بلاغ صيانة", daysLeft: "باقي {n} يوم", daysLate: "متأخر {n} يوم", today: "موعد اليوم", optAll: "المواعيد: الكل", optUrgent: "عاجل 🚨", optSoon: "قريباً", optSafe: "آمن", waTitle: "🚨 *بلاغ صيانة فنية*", waCode: "الكود", waLoc: "الموقع", waModel: "الموديل", waType: "النوع", waLast: "آخر صيانة" },
-        tr: { total: "Toplam", active: "Aktif", repair: "Arıza", singer: "Singer", over: "Over", orlay: "Orlay", search: "Kod ara...", btnReport: "Bakım Raporu Gönder", daysLeft: "{n} gün kaldı", daysLate: "{n} gün gecikti", today: "Bugün", optAll: "Tümü", optUrgent: "Acil 🚨", optSoon: "Yakında", optSafe: "Güvenli", waTitle: "🚨 *BAKIM TALEBİ*", waCode: "Kod", waLoc: "Konum", waModel: "Model", waType: "Tip", waLast: "Son Bakım" }
+        en: { total: "Total", active: "Active", repair: "Repair", stock: "Stock", singer: "Singer", over: "Over", orlay: "Orlay", btnReport: "Send Maintenance Report", daysLeft: "{n} Days left", daysLate: "{n} Days late", today: "Today", optAll: "Maint: All" },
+        ar: { total: "الإجمالي", active: "يعمل", repair: "أعطال", stock: "مخزن", singer: "سنجر", over: "أوفر", orlay: "أورليه", btnReport: "إرسال بلاغ صيانة", daysLeft: "باقي {n} يوم", daysLate: "متأخر {n} يوم", today: "موعد اليوم", optAll: "المواعيد: الكل" },
+        tr: { total: "Toplam", active: "Aktif", repair: "Arıza", stock: "Stok", singer: "Singer", over: "Over", orlay: "Orlay", btnReport: "Bakım Raporu Gönder", daysLeft: "{n} gün kaldı", daysLate: "{n} gün gecikti", today: "Bugün", optAll: "Tümü" }
     };
 
     async function init() {
+        const lineSelect = document.getElementById('lineFilter');
+        for(let i=1; i<=30; i++) {
+            let opt = document.createElement('option');
+            opt.value = `LINE ${i}`;
+            opt.textContent = `LINE ${i}`;
+            lineSelect.appendChild(opt);
+        }
+
         try {
             const response = await fetch(SHEET_URL);
             const text = await response.text();
@@ -125,12 +123,6 @@
                 let obj = {}; headers.forEach((h, i) => obj[h] = row[i]?.trim());
                 return obj;
             }).filter(m => m.Code);
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const codeFromURL = urlParams.get('code');
-            if (codeFromURL) {
-                document.getElementById('searchInput').value = codeFromURL;
-            }
             updateUI();
         } catch (e) { console.error("Load Error"); }
     }
@@ -151,15 +143,31 @@
         currentStatusFilter = 'all'; currentTypeFilter = 'all';
         document.getElementById('searchInput').value = '';
         document.getElementById('maintFilter').value = 'all';
+        document.getElementById('lineFilter').value = 'all';
         updateUI();
     }
 
     function updateUI() {
         const statsStatus = document.getElementById('statusStats');
-        statsStatus.innerHTML = `<div class="stat-box ${currentStatusFilter==='all' && currentTypeFilter==='all'?'active-filter':''}" onclick="resetAllFilters()"><h3>${allMachines.length}</h3><p>${translate('total')}</p></div><div class="stat-box ${currentStatusFilter==='active'?'active-filter':''}" style="border-bottom:4px solid var(--green)" onclick="setStatusFilter('active')"><h3>${allMachines.filter(m=>m.Status?.toLowerCase()==='active').length}</h3><p>${translate('active')}</p></div><div class="stat-box ${currentStatusFilter==='repair'?'active-filter':''}" style="border-bottom:4px solid var(--red)" onclick="setStatusFilter('repair')"><h3>${allMachines.filter(m=>m.Status?.toLowerCase()!=='active').length}</h3><p>${translate('repair')}</p></div>`;
+        // حساب الأعداد بناءً على الحالة
+        const total = allMachines.length;
+        const activeCount = allMachines.filter(m => m.Status?.toLowerCase() === 'active').length;
+        const repairCount = allMachines.filter(m => m.Status?.toLowerCase() === 'repair' || m.Status?.toLowerCase() === 'down').length;
+        const stockCount = allMachines.filter(m => m.Status?.toLowerCase() === 'stock').length;
+
+        statsStatus.innerHTML = `
+            <div class="stat-box ${currentStatusFilter==='all'?'active-filter':''}" onclick="resetAllFilters()"><h3>${total}</h3><p>${translate('total')}</p></div>
+            <div class="stat-box ${currentStatusFilter==='active'?'active-filter':''}" style="border-bottom:4px solid var(--green)" onclick="setStatusFilter('active')"><h3>${activeCount}</h3><p>${translate('active')}</p></div>
+            <div class="stat-box ${currentStatusFilter==='repair'?'active-filter':''}" style="border-bottom:4px solid var(--red)" onclick="setStatusFilter('repair')"><h3>${repairCount}</h3><p>${translate('repair')}</p></div>
+            <div class="stat-box ${currentStatusFilter==='stock'?'active-filter':''}" style="border-bottom:4px solid var(--stock)" onclick="setStatusFilter('stock')"><h3>${stockCount}</h3><p>${translate('stock')}</p></div>
+        `;
 
         const statsType = document.getElementById('typeStats');
-        statsType.innerHTML = `<div class="stat-box type-singer ${currentTypeFilter==='Singer'?'active-filter':''}" onclick="setTypeFilter('Singer')"><h3>${allMachines.filter(m=>m.Type?.toLowerCase().includes('singer')).length}</h3><p>${translate('singer')}</p></div><div class="stat-box type-over ${currentTypeFilter==='Over'?'active-filter':''}" onclick="setTypeFilter('Over')"><h3>${allMachines.filter(m=>m.Type?.toLowerCase().includes('over')).length}</h3><p>${translate('over')}</p></div><div class="stat-box type-orlay ${currentTypeFilter==='Orlay'?'active-filter':''}" onclick="setTypeFilter('Orlay')"><h3>${allMachines.filter(m=>m.Type?.toLowerCase().includes('orlay')).length}</h3><p>${translate('orlay')}</p></div>`;
+        statsType.innerHTML = `
+            <div class="stat-box ${currentTypeFilter==='Singer'?'active-filter':''}" style="border-bottom:4px solid var(--singer)" onclick="setTypeFilter('Singer')"><h3>${allMachines.filter(m=>m.Type?.toLowerCase().includes('singer')).length}</h3><p>${translate('singer')}</p></div>
+            <div class="stat-box ${currentTypeFilter==='Over'?'active-filter':''}" style="border-bottom:4px solid var(--over)" onclick="setTypeFilter('Over')"><h3>${allMachines.filter(m=>m.Type?.toLowerCase().includes('over')).length}</h3><p>${translate('over')}</p></div>
+            <div class="stat-box ${currentTypeFilter==='Orlay'?'active-filter':''}" style="border-bottom:4px solid var(--orlay)" onclick="setTypeFilter('Orlay')"><h3>${allMachines.filter(m=>m.Type?.toLowerCase().includes('orlay')).length}</h3><p>${translate('orlay')}</p></div>
+        `;
 
         filterData();
     }
@@ -167,33 +175,43 @@
     function filterData() {
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
         const maintF = document.getElementById('maintFilter').value;
+        const lineF = document.getElementById('lineFilter').value;
         const grid = document.getElementById('machinesGrid');
         
-        const urlParams = new URLSearchParams(window.location.search);
-        const codeFromURL = urlParams.get('code')?.toLowerCase().trim();
-
         grid.innerHTML = "";
 
         allMachines.forEach(m => {
             const mCode = m.Code?.toLowerCase().trim();
             const mStat = (m.Status || "").toLowerCase();
             const mType = (m.Type || "").toLowerCase();
+            const mLocation = (m.Location || "").toUpperCase();
             const diff = getDaysDiff(m["Next Maintenance"]);
             let mState = (diff !== null && diff <= 7) ? 'urgent' : (diff !== null && diff <= 15 ? 'soon' : 'safe');
 
-            // منطق البحث المحدث: مطابقة تامة للسكان، مرنة للكتابة اليدوية
-            let matchesSearch = (codeFromURL && query === codeFromURL) ? (mCode === query) : (mCode.includes(query));
+            const matchesSearch = mCode.includes(query);
+            
+            // فلتر الحالة المطور (Active, Repair, Stock)
+            let matchesStatus = currentStatusFilter === 'all';
+            if (currentStatusFilter === 'active') matchesStatus = mStat === 'active';
+            if (currentStatusFilter === 'repair') matchesStatus = (mStat === 'repair' || mStat === 'down');
+            if (currentStatusFilter === 'stock') matchesStatus = mStat === 'stock';
 
-            const matchesStatus = currentStatusFilter === 'all' || (currentStatusFilter === 'active' && mStat === 'active') || (currentStatusFilter === 'repair' && mStat !== 'active');
             const matchesType = currentTypeFilter === 'all' || mType.includes(currentTypeFilter.toLowerCase());
             const matchesMaint = maintF === 'all' || mState === maintF;
+            
+            // حل مشكلة تداخل الأرقام (2 vs 12) باستخدام Regex للتأكد من الرقم المستقل
+            let matchesLine = true;
+            if (lineF !== 'all') {
+                const lineNum = lineF.match(/\d+/)[0]; // استخراج الرقم من LINE 2
+                const regex = new RegExp(`\\b${lineNum}\\b`); // البحث عن الرقم ككلمة مستقلة
+                matchesLine = regex.test(mLocation);
+            }
 
-            if (matchesSearch && matchesStatus && matchesType && matchesMaint) {
+            if (matchesSearch && matchesStatus && matchesType && matchesMaint && matchesLine) {
                 const card = document.createElement('div');
-                card.className = `machine-card ${mState === 'urgent' ? 'card-urgent' : ''}`;
-                
-                // فتح الكارت تلقائياً في حالة المطابقة التامة (QR)
-                if(query !== '' && mCode === query) card.classList.add('expanded');
+                let cardClass = "machine-card";
+                if(mState === 'urgent') cardClass += " card-urgent";
+                card.className = cardClass;
                 
                 card.onclick = (e) => { if(!e.target.closest('button')) card.classList.toggle('expanded'); };
                 
@@ -205,12 +223,17 @@
                     if(!['Code','Status','Type'].includes(k)) bodyContent += `<div class="detail-item"><span class="detail-label">${k}:</span><span>${v||'-'}</span></div>`;
                 });
 
+                let statusClass = 'bg-stock';
+                if(mStat === 'active') statusClass = 'bg-active';
+                else if(mStat === 'repair' || mStat === 'down') statusClass = 'bg-repair';
+
                 card.innerHTML = `
                     <div class="card-header">
                         <div><small style="color:var(--muted)">${m.Type}</small><h4 style="margin:2px 0">${m.Code}</h4></div>
-                        <span class="status-badge ${mStat==='active'?'bg-active':'bg-repair'}">${mStat}</span>
+                        <span class="status-badge ${statusClass}">${mStat}</span>
                     </div>
                     <div style="font-size:0.85rem; font-weight:600">${m.Model || ''}</div>
+                    <div style="font-size:0.75rem; color:var(--muted); margin-top:4px"><i class="fas fa-map-marker-alt"></i> ${m.Location || '-'}</div>
                     ${diff!==null ? `<span class="days-badge ${daysCls}">${daysTxt}</span>` : ''}
                     <div class="card-body">
                         ${bodyContent}
@@ -224,8 +247,7 @@
     }
 
     function sendWA(machine) {
-        const t = dictionary[currentLang];
-        const text = `${t.waTitle}%0A%0A🆔 *${t.waCode}:* ${machine.Code}%0A📍 *${t.waLoc}:* ${machine.Location || '-'}%0A📦 *${t.waModel}:* ${machine.Model || '-'}%0A⚙️ *${t.waType}:* ${machine.Type || '-'}%0A📅 *${t.waLast}:* ${machine["Last Maintenance"] || '-'}`;
+        const text = `🚨 *MAINTENANCE REQUEST*%0A%0A🆔 *Code:* ${machine.Code}%0A📍 *Loc:* ${machine.Location || '-'}%0A⚙️ *Type:* ${machine.Type || '-'}`;
         window.open(`https://wa.me/${MAINTENANCE_PHONE}?text=${text}`, '_blank');
     }
 
