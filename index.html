@@ -117,7 +117,9 @@
 
             const urlParams = new URLSearchParams(window.location.search);
             const codeFromURL = urlParams.get('code');
-            if (codeFromURL) document.getElementById('searchInput').value = codeFromURL;
+            if (codeFromURL) {
+                document.getElementById('searchInput').value = codeFromURL;
+            }
 
             updateUI();
         } catch (e) { console.error("Load Error"); }
@@ -190,7 +192,9 @@
             const diff = getDaysDiff(m["Next Maintenance"]);
             let mState = (diff !== null && diff <= 7) ? 'urgent' : (diff !== null && diff <= 15 ? 'soon' : 'safe');
 
-            let matchesSearch = mCode.includes(query);
+            // تعديل البحث هنا ليكون تطابقاً تاماً عند وجود نص بحث
+            let matchesSearch = query === '' || mCode === query;
+            
             let matchesStatus = currentStatusFilter === 'all' || (currentStatusFilter === 'active' && mStat === 'active') || (currentStatusFilter === 'repair' && ['repair', 'down', 'أعطال'].includes(mStat)) || (currentStatusFilter === 'stock' && mStat === 'stock');
             const matchesType = currentTypeFilter === 'all' || mType.includes(currentTypeFilter.toLowerCase());
             const matchesMaint = maintF === 'all' || mState === maintF;
@@ -199,6 +203,7 @@
             if (matchesSearch && matchesStatus && matchesType && matchesMaint && matchesLine) {
                 const card = document.createElement('div');
                 card.className = `machine-card`;
+                // إذا كان البحث غير فارغ والكود متطابق تماماً، نقوم بتوسيع الكارت تلقائياً
                 if(query !== '' && mCode === query) card.classList.add('expanded');
                 card.onclick = (e) => { if(!e.target.closest('button')) card.classList.toggle('expanded'); };
                 
