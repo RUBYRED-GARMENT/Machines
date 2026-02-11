@@ -14,48 +14,66 @@
             --green: #16a34a; --red: #dc2626; --orange: #f59e0b; --whatsapp: #25d366;
             --singer: #3b82f6; --over: #a855f7; --orlay: #ec4899; --stock: #64748b;
         }
+
+        /* --- Login Screen Styles --- */
+        #lockScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); display: flex; align-items: center; justify-content: center;
+            z-index: 9999; transition: 0.5s;
+        }
+        .login-box {
+            background: var(--card); padding: 40px; border-radius: 20px;
+            border: 1px solid var(--border); text-align: center; width: 90%; max-width: 400px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .login-box i { font-size: 50px; color: var(--primary); margin-bottom: 20px; }
+        .login-box h2 { font-weight: 800; margin-bottom: 10px; }
+        .login-box p { color: var(--muted); font-size: 0.9rem; margin-bottom: 25px; }
+        .login-box input {
+            width: 100%; padding: 15px; background: var(--bg); border: 2px solid var(--border);
+            border-radius: 12px; color: white; text-align: center; font-size: 1.5rem;
+            letter-spacing: 5px; outline: none; transition: 0.3s; box-sizing: border-box;
+        }
+        .login-box input:focus { border-color: var(--primary); }
+        .login-btn {
+            width: 100%; padding: 15px; margin-top: 20px; background: var(--primary);
+            color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;
+        }
+        #mainWrapper { display: none; } /* إخفاء النظام بالكامل */
+
+        /* --- Your Original Styles --- */
         body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; transition: 0.3s; }
         .container { max-width: 1200px; margin: auto; }
         .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; position: relative; }
         .brand { font-weight: 800; font-size: 1.5rem; color:white; letter-spacing: 1px; }
-        
         .logo img { height: 55px; width: 55px; animation: spin 4s linear infinite; transform-origin: center center; display: block; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
         @media (max-width: 768px) { .logo { display: none !important; } }
-
         .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 15px; }
         .stat-box { background: var(--card); padding: 12px; border-radius: 12px; border: 1px solid var(--border); text-align: center; cursor: pointer; transition: 0.2s; }
         .stat-box h3 { margin: 0; font-size: 1.2rem; }
         .stat-box p { margin: 2px 0 0; font-size: 0.75rem; font-weight: 600; }
         .active-filter { border: 2px solid white !important; background: rgba(255,255,255,0.15); box-shadow: 0 0 10px rgba(255,255,255,0.1); }
-
         .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         select, input { background: var(--card); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 10px; font-family: 'Cairo'; outline: none; flex: 1; min-width: 140px; }
-        
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
         .machine-card { background: var(--card); border-radius: 15px; padding: 15px; border: 1px solid var(--border); transition: 0.3s; cursor: pointer; position: relative; }
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        
         .card-body { display: none; margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border); }
         .machine-card.expanded .card-body { display: block; }
-        
         .days-badge { font-size: 0.7rem; padding: 3px 8px; border-radius: 5px; font-weight: bold; margin-top: 5px; display: inline-block; }
         .days-urgent { background: var(--red); color: white; }
         .days-soon { background: var(--orange); color: white; }
         .days-safe { background: var(--green); color: white; }
-
         .status-badge { font-size: 0.65rem; padding: 3px 8px; border-radius: 15px; font-weight: 700; text-transform: uppercase; }
         .bg-active { background: rgba(22, 163, 74, 0.2); color: var(--green); }
         .bg-repair { background: rgba(220, 38, 38, 0.2); color: var(--red); }
         .bg-stock { background: rgba(100, 116, 139, 0.2); color: var(--stock); }
-        
         .maint-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; margin-bottom: 10px; }
         .btn-start { background: var(--orange); color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: 700; font-size: 0.8rem; transition: 0.2s; }
         .btn-finish { background: var(--singer); color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: 700; font-size: 0.8rem; transition: 0.2s; }
         .btn-start:active, .btn-finish:active { transform: scale(0.95); opacity: 0.8; }
         .btn-start:disabled, .btn-finish:disabled { background: #444; cursor: not-allowed; }
-
         .whatsapp-btn { background: var(--whatsapp); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; width: 100%; font-family: 'Cairo'; }
         .detail-item { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .detail-label { color: var(--muted); }
@@ -63,27 +81,40 @@
 </head>
 <body>
 
-<div class="container">
-    <header class="top-nav">
-        <div class="brand">RUBY<span style="color:red">RED</span> MACHINES</div>
-        <div class="logo"><img src="pic/logooo.png" alt="rubyred" /></div>
-        <select id="langSelect" onchange="changeLang(this.value)" style="cursor: pointer; flex: none;">
-            <option value="en">English</option>
-            <option value="ar">العربية</option>
-            <option value="tr">Türkçe</option>
-        </select>
-    </header>
-
-    <div class="stats-container" id="statusStats"></div>
-    <div class="stats-container" id="typeStats"></div>
-
-    <div class="controls">
-        <input type="text" id="searchInput" style="flex:2" placeholder="Search code..." onkeyup="filterData()">
-        <select id="lineFilter" onchange="filterData()"></select>
-        <select id="maintFilter" onchange="filterData()"></select>
+<div id="lockScreen">
+    <div class="login-box">
+        <i class="fas fa-shield-alt"></i>
+        <h2>SECURE ACCESS</h2>
+        <p>Please enter the 6-digit passcode</p>
+        <input type="password" id="passInput" placeholder="••••••" maxlength="6">
+        <button class="login-btn" onclick="checkLogin()">LOGIN</button>
+        <p id="errHint" style="color:var(--red); margin-top:15px; display:none; font-weight:bold;">Invalid Passcode!</p>
     </div>
+</div>
 
-    <div class="grid" id="machinesGrid"></div>
+<div id="mainWrapper">
+    <div class="container">
+        <header class="top-nav">
+            <div class="brand">RUBY<span style="color:red">RED</span> MACHINES</div>
+            <div class="logo"><img src="pic/logooo.png" alt="rubyred" /></div>
+            <select id="langSelect" onchange="changeLang(this.value)" style="cursor: pointer; flex: none;">
+                <option value="en">English</option>
+                <option value="ar">العربية</option>
+                <option value="tr">Türkçe</option>
+            </select>
+        </header>
+
+        <div class="stats-container" id="statusStats"></div>
+        <div class="stats-container" id="typeStats"></div>
+
+        <div class="controls">
+            <input type="text" id="searchInput" style="flex:2" placeholder="Search code..." onkeyup="filterData()">
+            <select id="lineFilter" onchange="filterData()"></select>
+            <select id="maintFilter" onchange="filterData()"></select>
+        </div>
+
+        <div class="grid" id="machinesGrid"></div>
+    </div>
 </div>
 
 <script>
@@ -100,8 +131,22 @@
     const dictionary = {
         en: { total: "Total", active: "Active", repair: "Repair", stock: "Stock", singer: "Singer", over: "Over", orlay: "Orlay", btnReport: "Send WhatsApp Report", daysLeft: "{n} Days left", daysLate: "{n} Days late", today: "Today", optAll: "Maint: All", startM: "Start Maint", finishM: "Finish Maint", search: "Search code...", allLines: "All Lines", urgent: "Urgent 🚨", soon: "Soon", safe: "Safe" },
         ar: { total: "الإجمالي", active: "يعمل", repair: "أعطال", stock: "مخزن", singer: "سنجر", over: "أوفر", orlay: "أورليه", btnReport: "إرسال بلاغ واتساب", daysLeft: "باقي {n} يوم", daysLate: "متأخر {n} يوم", today: "موعد اليوم", optAll: "المواعيد: الكل", startM: "بدء صيانة", finishM: "إنهاء صيانة", search: "بحث بالكود...", allLines: "كل الخطوط", urgent: "عاجل 🚨", soon: "قريباً", safe: "آمن" },
-        tr: { total: "Toplam", active: "Aktif", repair: "Arıza", stock: "Stok", singer: "Singer", over: "Over", orlay: "Orlay", btnReport: "WP Raporu Gönder", daysLeft: "{n} gün kaldı", daysLate: "{n} gün gecikti", today: "Bugün", optAll: "Tümü", startM: "Başlat", finishM: "Bitir", search: "Kod ara...", allLines: "Tüm Hatlar", urgent: "Acil 🚨", soon: "Yakında", safe: "Güvenli" }
+        tr: { total: "Toplam", active: "Aktif", repair: "Arıza", stock: "Stok", singer: "Singer", over: "Over", orlay: "Orlay", btnReport: "WP Raporu Gönder", daysLeft: "{n} gün kaldı", daysLate: "{n} gün gecikti", today: "Bugün", optAll: "Tümü", startM: "Başlat", finishM: "Bitir", search: "Kod ara...", allLines: "Tüm Hatlar", urgent: "Acil 🚨", soon: "Yakında", safe: "Güvenلي" }
     };
+
+    // --- Login Logic ---
+    function checkLogin() {
+        const pass = document.getElementById('passInput').value;
+        if(pass === "505050") {
+            document.getElementById('lockScreen').style.display = 'none';
+            document.getElementById('mainWrapper').style.display = 'block';
+            init(); // ابدأ النظام فقط بعد الباسوورد
+            sessionStorage.setItem('isAuth', 'true');
+        } else {
+            document.getElementById('errHint').style.display = 'block';
+            document.getElementById('passInput').value = '';
+        }
+    }
 
     async function init() {
         populateFilters();
@@ -192,9 +237,7 @@
             const diff = getDaysDiff(m["Next Maintenance"]);
             let mState = (diff !== null && diff <= 7) ? 'urgent' : (diff !== null && diff <= 15 ? 'soon' : 'safe');
 
-            // تعديل البحث هنا ليكون تطابقاً تاماً عند وجود نص بحث
             let matchesSearch = query === '' || mCode === query;
-            
             let matchesStatus = currentStatusFilter === 'all' || (currentStatusFilter === 'active' && mStat === 'active') || (currentStatusFilter === 'repair' && ['repair', 'down', 'أعطال'].includes(mStat)) || (currentStatusFilter === 'stock' && mStat === 'stock');
             const matchesType = currentTypeFilter === 'all' || mType.includes(currentTypeFilter.toLowerCase());
             const matchesMaint = maintF === 'all' || mState === maintF;
@@ -203,7 +246,6 @@
             if (matchesSearch && matchesStatus && matchesType && matchesMaint && matchesLine) {
                 const card = document.createElement('div');
                 card.className = `machine-card`;
-                // إذا كان البحث غير فارغ والكود متطابق تماماً، نقوم بتوسيع الكارت تلقائياً
                 if(query !== '' && mCode === query) card.classList.add('expanded');
                 card.onclick = (e) => { if(!e.target.closest('button')) card.classList.toggle('expanded'); };
                 
@@ -269,9 +311,15 @@
         populateFilters();
         updateUI(); 
     }
-    window.onload = init;
+
+    // السماح بالدخول التلقائي إذا تم تسجيل الدخول مسبقاً في نفس الجلسة
+    window.onload = () => {
+        if(sessionStorage.getItem('isAuth') === 'true') {
+            document.getElementById('lockScreen').style.display = 'none';
+            document.getElementById('mainWrapper').style.display = 'block';
+            init();
+        }
+    };
 </script>
 </body>
 </html>
-
-
