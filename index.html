@@ -50,7 +50,13 @@
         .bg-repair { background: rgba(220, 38, 38, 0.2); color: var(--red); }
         .bg-stock { background: rgba(100, 116, 139, 0.2); color: var(--stock); }
         
-        .whatsapp-btn { margin-top: 15px; background: var(--whatsapp); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; width: 100%; font-family: 'Cairo'; }
+        .maint-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; margin-bottom: 10px; }
+        .btn-start { background: var(--orange); color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: 700; font-size: 0.8rem; transition: 0.2s; }
+        .btn-finish { background: var(--singer); color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: 700; font-size: 0.8rem; transition: 0.2s; }
+        .btn-start:active, .btn-finish:active { transform: scale(0.95); opacity: 0.8; }
+        .btn-start:disabled, .btn-finish:disabled { background: #444; cursor: not-allowed; }
+
+        .whatsapp-btn { background: var(--whatsapp); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; width: 100%; font-family: 'Cairo'; }
         .detail-item { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .detail-label { color: var(--muted); }
     </style>
@@ -73,15 +79,8 @@
 
     <div class="controls">
         <input type="text" id="searchInput" style="flex:2" placeholder="Search code..." onkeyup="filterData()">
-        <select id="lineFilter" onchange="filterData()">
-            <option value="all">All Lines / كل الخطوط</option>
-        </select>
-        <select id="maintFilter" onchange="filterData()">
-            <option value="all" id="optAll">Maintenance: All</option>
-            <option value="urgent" id="optUrgent">Urgent 🚨</option>
-            <option value="soon" id="optSoon">Soon</option>
-            <option value="safe" id="optSafe">Safe</option>
-        </select>
+        <select id="lineFilter" onchange="filterData()"></select>
+        <select id="maintFilter" onchange="filterData()"></select>
     </div>
 
     <div class="grid" id="machinesGrid"></div>
@@ -91,6 +90,7 @@
     const SHEET_ID = "1p1JEBOFYfCmys864VVBH-qqzByErjSCxdhu-cqT4Grw";
     const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
     const MAINTENANCE_PHONE = "201279552202";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_XXXXXXXXX/exec"; 
 
     let allMachines = [];
     let currentLang = 'en';
@@ -98,20 +98,13 @@
     let currentTypeFilter = 'all';
 
     const dictionary = {
-        en: { total: "Total", active: "Active", repair: "Repair", stock: "Stock", singer: "Singer", over: "Over", orlay: "Orlay", btnReport: "Send Maintenance Report", daysLeft: "{n} Days left", daysLate: "{n} Days late", today: "Today", optAll: "Maint: All" },
-        ar: { total: "الإجمالي", active: "يعمل", repair: "أعطال", stock: "مخزن", singer: "سنجر", over: "أوفر", orlay: "أورليه", btnReport: "إرسال بلاغ صيانة", daysLeft: "باقي {n} يوم", daysLate: "متأخر {n} يوم", today: "موعد اليوم", optAll: "المواعيد: الكل" },
-        tr: { total: "Toplam", active: "Aktif", repair: "Arıza", stock: "Stok", singer: "Singer", over: "Over", orlay: "Orlay", btnReport: "Bakım Raporu Gönder", daysLeft: "{n} gün kaldı", daysLate: "{n} gün gecikti", today: "Bugün", optAll: "Tümü" }
+        en: { total: "Total", active: "Active", repair: "Repair", stock: "Stock", singer: "Singer", over: "Over", orlay: "Orlay", btnReport: "Send WhatsApp Report", daysLeft: "{n} Days left", daysLate: "{n} Days late", today: "Today", optAll: "Maint: All", startM: "Start Maint", finishM: "Finish Maint", search: "Search code...", allLines: "All Lines", urgent: "Urgent 🚨", soon: "Soon", safe: "Safe" },
+        ar: { total: "الإجمالي", active: "يعمل", repair: "أعطال", stock: "مخزن", singer: "سنجر", over: "أوفر", orlay: "أورليه", btnReport: "إرسال بلاغ واتساب", daysLeft: "باقي {n} يوم", daysLate: "متأخر {n} يوم", today: "موعد اليوم", optAll: "المواعيد: الكل", startM: "بدء صيانة", finishM: "إنهاء صيانة", search: "بحث بالكود...", allLines: "كل الخطوط", urgent: "عاجل 🚨", soon: "قريباً", safe: "آمن" },
+        tr: { total: "Toplam", active: "Aktif", repair: "Arıza", stock: "Stok", singer: "Singer", over: "Over", orlay: "Orlay", btnReport: "WP Raporu Gönder", daysLeft: "{n} gün kaldı", daysLate: "{n} gün gecikti", today: "Bugün", optAll: "Tümü", startM: "Başlat", finishM: "Bitir", search: "Kod ara...", allLines: "Tüm Hatlar", urgent: "Acil 🚨", soon: "Yakında", safe: "Güvenli" }
     };
 
     async function init() {
-        const lineSelect = document.getElementById('lineFilter');
-        for(let i=1; i<=30; i++) {
-            let opt = document.createElement('option');
-            opt.value = `LINE ${i}`;
-            opt.textContent = `LINE ${i}`;
-            lineSelect.appendChild(opt);
-        }
-
+        populateFilters();
         try {
             const response = await fetch(SHEET_URL);
             const text = await response.text();
@@ -122,15 +115,28 @@
                 return obj;
             }).filter(m => m.Code);
 
-            // التقاط الكود من الرابط URL
             const urlParams = new URLSearchParams(window.location.search);
             const codeFromURL = urlParams.get('code');
-            if (codeFromURL) {
-                document.getElementById('searchInput').value = codeFromURL;
-            }
+            if (codeFromURL) document.getElementById('searchInput').value = codeFromURL;
 
             updateUI();
         } catch (e) { console.error("Load Error"); }
+    }
+
+    function populateFilters() {
+        const lineSelect = document.getElementById('lineFilter');
+        lineSelect.innerHTML = `<option value="all">${translate('allLines')}</option>`;
+        for(let i=1; i<=30; i++) {
+            lineSelect.innerHTML += `<option value="LINE ${i}">LINE ${i}</option>`;
+        }
+        const maintSelect = document.getElementById('maintFilter');
+        maintSelect.innerHTML = `
+            <option value="all">${translate('optAll')}</option>
+            <option value="urgent">${translate('urgent')}</option>
+            <option value="soon">${translate('soon')}</option>
+            <option value="safe">${translate('safe')}</option>
+        `;
+        document.getElementById('searchInput').placeholder = translate('search');
     }
 
     function getDaysDiff(dateStr) {
@@ -145,25 +151,19 @@
         return n !== undefined ? text.replace('{n}', Math.abs(n)) : text;
     }
 
-    function resetAllFilters() {
-        currentStatusFilter = 'all'; currentTypeFilter = 'all';
-        document.getElementById('searchInput').value = '';
-        document.getElementById('maintFilter').value = 'all';
-        document.getElementById('lineFilter').value = 'all';
-        updateUI();
-    }
-
     function updateUI() {
         const statsStatus = document.getElementById('statusStats');
-        const activeCount = allMachines.filter(m => m.Status?.toLowerCase() === 'active').length;
-        const repairCount = allMachines.filter(m => ['repair', 'down'].includes(m.Status?.toLowerCase())).length;
-        const stockCount = allMachines.filter(m => m.Status?.toLowerCase() === 'stock').length;
+        const counts = {
+            active: allMachines.filter(m => m.Status?.toLowerCase() === 'active').length,
+            repair: allMachines.filter(m => ['repair', 'down', 'أعطال'].includes(m.Status?.toLowerCase())).length,
+            stock: allMachines.filter(m => m.Status?.toLowerCase() === 'stock').length
+        };
 
         statsStatus.innerHTML = `
             <div class="stat-box ${currentStatusFilter==='all'?'active-filter':''}" onclick="resetAllFilters()"><h3>${allMachines.length}</h3><p>${translate('total')}</p></div>
-            <div class="stat-box ${currentStatusFilter==='active'?'active-filter':''}" style="border-bottom:4px solid var(--green)" onclick="setStatusFilter('active')"><h3>${activeCount}</h3><p>${translate('active')}</p></div>
-            <div class="stat-box ${currentStatusFilter==='repair'?'active-filter':''}" style="border-bottom:4px solid var(--red)" onclick="setStatusFilter('repair')"><h3>${repairCount}</h3><p>${translate('repair')}</p></div>
-            <div class="stat-box ${currentStatusFilter==='stock'?'active-filter':''}" style="border-bottom:4px solid var(--stock)" onclick="setStatusFilter('stock')"><h3>${stockCount}</h3><p>${translate('stock')}</p></div>
+            <div class="stat-box ${currentStatusFilter==='active'?'active-filter':''}" style="border-bottom:4px solid var(--green)" onclick="setStatusFilter('active')"><h3>${counts.active}</h3><p>${translate('active')}</p></div>
+            <div class="stat-box ${currentStatusFilter==='repair'?'active-filter':''}" style="border-bottom:4px solid var(--red)" onclick="setStatusFilter('repair')"><h3>${counts.repair}</h3><p>${translate('repair')}</p></div>
+            <div class="stat-box ${currentStatusFilter==='stock'?'active-filter':''}" style="border-bottom:4px solid var(--stock)" onclick="setStatusFilter('stock')"><h3>${counts.stock}</h3><p>${translate('stock')}</p></div>
         `;
 
         const statsType = document.getElementById('typeStats');
@@ -180,11 +180,6 @@
         const maintF = document.getElementById('maintFilter').value;
         const lineF = document.getElementById('lineFilter').value;
         const grid = document.getElementById('machinesGrid');
-        
-        // التحقق إذا كان الرابط يحتوي على كود
-        const urlParams = new URLSearchParams(window.location.search);
-        const codeFromURL = urlParams.get('code')?.toLowerCase().trim();
-
         grid.innerHTML = "";
 
         allMachines.forEach(m => {
@@ -195,31 +190,16 @@
             const diff = getDaysDiff(m["Next Maintenance"]);
             let mState = (diff !== null && diff <= 7) ? 'urgent' : (diff !== null && diff <= 15 ? 'soon' : 'safe');
 
-            // منطق البحث: إذا كان الكود قادم من URL، يجب أن يطابق تماماً. إذا كان بحث يدوي، يطابق جزئياً.
-            let matchesSearch = (codeFromURL && query === codeFromURL) ? (mCode === query) : (mCode.includes(query));
-
-            let matchesStatus = currentStatusFilter === 'all' || 
-                (currentStatusFilter === 'active' && mStat === 'active') || 
-                (currentStatusFilter === 'repair' && ['repair', 'down'].includes(mStat)) || 
-                (currentStatusFilter === 'stock' && mStat === 'stock');
-
+            let matchesSearch = mCode.includes(query);
+            let matchesStatus = currentStatusFilter === 'all' || (currentStatusFilter === 'active' && mStat === 'active') || (currentStatusFilter === 'repair' && ['repair', 'down', 'أعطال'].includes(mStat)) || (currentStatusFilter === 'stock' && mStat === 'stock');
             const matchesType = currentTypeFilter === 'all' || mType.includes(currentTypeFilter.toLowerCase());
             const matchesMaint = maintF === 'all' || mState === maintF;
-            
-            let matchesLine = true;
-            if (lineF !== 'all') {
-                const lineNum = lineF.match(/\d+/)[0];
-                const regex = new RegExp(`\\b${lineNum}\\b`);
-                matchesLine = regex.test(mLocation);
-            }
+            let matchesLine = lineF === 'all' || new RegExp(`\\b${lineF.match(/\d+/)?.[0]}\\b`).test(mLocation);
 
             if (matchesSearch && matchesStatus && matchesType && matchesMaint && matchesLine) {
                 const card = document.createElement('div');
-                card.className = `machine-card ${mState === 'urgent' ? 'card-urgent' : ''}`;
-                
-                // فتح الكارت تلقائياً في حالة المطابقة التامة (QR/URL)
+                card.className = `machine-card`;
                 if(query !== '' && mCode === query) card.classList.add('expanded');
-
                 card.onclick = (e) => { if(!e.target.closest('button')) card.classList.toggle('expanded'); };
                 
                 let daysTxt = diff === null ? "" : (diff > 0 ? translate('daysLeft', diff) : (diff < 0 ? translate('daysLate', diff) : translate('today')));
@@ -230,18 +210,24 @@
                     if(!['Code','Status','Type'].includes(k)) bodyContent += `<div class="detail-item"><span class="detail-label">${k}:</span><span>${v||'-'}</span></div>`;
                 });
 
-                let statusClass = mStat === 'active' ? 'bg-active' : (['repair', 'down'].includes(mStat) ? 'bg-repair' : 'bg-stock');
-
                 card.innerHTML = `
                     <div class="card-header">
-                        <div><small style="color:var(--muted)">${m.Type}</small><h4 style="margin:2px 0">${m.Code}</h4></div>
-                        <span class="status-badge ${statusClass}">${mStat}</span>
+                        <div><small style="color:var(--muted)">${translate(m.Type)}</small><h4 style="margin:2px 0">${m.Code}</h4></div>
+                        <span class="status-badge ${mStat === 'active' ? 'bg-active' : (['repair', 'down', 'أعطال'].includes(mStat) ? 'bg-repair' : 'bg-stock')}">${translate(mStat)}</span>
                     </div>
                     <div style="font-size:0.85rem; font-weight:600">${m.Model || ''}</div>
                     <div style="font-size:0.75rem; color:var(--muted); margin-top:4px"><i class="fas fa-map-marker-alt"></i> ${m.Location || '-'}</div>
                     ${diff!==null ? `<span class="days-badge ${daysCls}">${daysTxt}</span>` : ''}
                     <div class="card-body">
                         ${bodyContent}
+                        <div class="maint-actions">
+                            <button class="btn-start" onclick="handleMaint('${m.Code}', '${m.Location}', '${m.Type}', 'start', this)">
+                                <i class="fas fa-play"></i> ${translate('startM')}
+                            </button>
+                            <button class="btn-finish" onclick="handleMaint('${m.Code}', '${m.Location}', '${m.Type}', 'finish', this)">
+                                <i class="fas fa-check"></i> ${translate('finishM')}
+                            </button>
+                        </div>
                         <button class="whatsapp-btn" onclick="sendWA(${JSON.stringify(m).replace(/"/g, '&quot;')})">
                             <i class="fab fa-whatsapp"></i> ${translate('btnReport')}
                         </button>
@@ -251,14 +237,33 @@
         });
     }
 
+    async function handleMaint(code, loc, type, action, btn) {
+        const originalText = btn.innerHTML;
+        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors',
+                body: JSON.stringify({ code, location: loc, type, action })
+            });
+            alert(action === 'start' ? "Maint. Started ✅" : "Maint. Finished ✅");
+        } catch (e) { alert("Error!"); }
+        finally { btn.disabled = false; btn.innerHTML = originalText; }
+    }
+
     function sendWA(machine) {
-        const text = `🚨 *MAINTENANCE REQUEST*%0A%0A🆔 *Code:* ${machine.Code}%0A📍 *Loc:* ${machine.Location || '-'}`;
+        const text = `🚨 *MAINTENANCE REQUEST*%0A%0A🆔 *Code:* ${machine.Code}%0A📍 *Location:* ${machine.Location || '-'}%0A📦 *Model:* ${machine.Model || '-'}%0A⚙️ *Type:* ${machine.Type || '-'}%0A📅 *Last Service:* ${machine['Last Maintenance'] || '-'}`;
         window.open(`https://wa.me/${MAINTENANCE_PHONE}?text=${text}`, '_blank');
     }
 
     function setStatusFilter(s) { currentStatusFilter = s; updateUI(); }
     function setTypeFilter(t) { currentTypeFilter = currentTypeFilter === t ? 'all' : t; updateUI(); }
-    function changeLang(l) { currentLang = l; document.getElementById('htmlPage').dir = l === 'ar' ? 'rtl' : 'ltr'; updateUI(); }
+    function resetAllFilters() { currentStatusFilter = 'all'; currentTypeFilter = 'all'; document.getElementById('searchInput').value = ''; updateUI(); }
+    function changeLang(l) { 
+        currentLang = l; 
+        document.getElementById('htmlPage').dir = l === 'ar' ? 'rtl' : 'ltr'; 
+        populateFilters();
+        updateUI(); 
+    }
     window.onload = init;
 </script>
 </body>
