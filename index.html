@@ -39,7 +39,7 @@
             width: 100%; padding: 15px; margin-top: 20px; background: var(--primary);
             color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;
         }
-        #mainWrapper { display: none; } /* إخفاء النظام بالكامل */
+        #mainWrapper { display: none; } 
 
         /* --- Your Original Styles --- */
         body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; transition: 0.3s; }
@@ -57,7 +57,19 @@
         .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         select, input { background: var(--card); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 10px; font-family: 'Cairo'; outline: none; flex: 1; min-width: 140px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        
+        /* --- Glow Effect for Urgent Machines --- */
         .machine-card { background: var(--card); border-radius: 15px; padding: 15px; border: 1px solid var(--border); transition: 0.3s; cursor: pointer; position: relative; }
+        .urgent-glow { 
+            border: 2px solid var(--red) !important; 
+            animation: glow-pulse 1.5s infinite alternate; 
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.5);
+        }
+        @keyframes glow-pulse {
+            from { box-shadow: 0 0 5px rgba(220, 38, 38, 0.4); }
+            to { box-shadow: 0 0 20px rgba(220, 38, 38, 0.8); }
+        }
+
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .card-body { display: none; margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border); }
         .machine-card.expanded .card-body { display: block; }
@@ -70,6 +82,16 @@
         .bg-repair { background: rgba(220, 38, 38, 0.2); color: var(--red); }
         .bg-stock { background: rgba(100, 116, 139, 0.2); color: var(--stock); }
         .maint-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; margin-bottom: 10px; }
+        
+        /* --- Note Area Styles --- */
+        .note-area { display: none; margin-top: 10px; animation: fadeIn 0.3s; }
+        .note-area textarea { 
+            width: 100%; background: #0f172a; color: white; border: 1px solid var(--singer); 
+            border-radius: 8px; padding: 10px; font-family: 'Cairo'; font-size: 0.8rem; resize: none; box-sizing: border-box;
+        }
+        .btn-done { background: var(--green); color: white; border: none; width: 100%; padding: 8px; border-radius: 8px; margin-top: 5px; font-weight: 700; cursor: pointer; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         .btn-start { background: var(--orange); color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: 700; font-size: 0.8rem; transition: 0.2s; }
         .btn-finish { background: var(--singer); color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: 700; font-size: 0.8rem; transition: 0.2s; }
         .btn-start:active, .btn-finish:active { transform: scale(0.95); opacity: 0.8; }
@@ -121,7 +143,7 @@
     const SHEET_ID = "1p1JEBOFYfCmys864VVBH-qqzByErjSCxdhu-cqT4Grw";
     const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
     const MAINTENANCE_PHONE = "201279552202";
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6DCXr4JqQQjIww_J8yWJfZVg8gLJv08GIhyL7XEnVBJpv3UYlKJXt0Bdaw5hGm_WSRA/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzEjGwm3AmxAA45TD54sOtwTggluGB2QdutCzH-uYU14KelVIDIN2ciwpY1xWjrvELRWg/exec"; 
 
     let allMachines = [];
     let currentLang = 'en';
@@ -129,18 +151,17 @@
     let currentTypeFilter = 'all';
 
     const dictionary = {
-        en: { total: "Total", active: "Active", repair: "Repair", stock: "Stock", singer: "Singer", over: "Over", orlay: "Orlay", btnReport: "Send WhatsApp Report", daysLeft: "{n} Days left", daysLate: "{n} Days late", today: "Today", optAll: "Maint: All", startM: "Start Maint", finishM: "Finish Maint", search: "Search code...", allLines: "All Lines", urgent: "Urgent 🚨", soon: "Soon", safe: "Safe" },
-        ar: { total: "الإجمالي", active: "يعمل", repair: "أعطال", stock: "مخزن", singer: "سنجر", over: "أوفر", orlay: "أورليه", btnReport: "إرسال بلاغ واتساب", daysLeft: "باقي {n} يوم", daysLate: "متأخر {n} يوم", today: "موعد اليوم", optAll: "المواعيد: الكل", startM: "بدء صيانة", finishM: "إنهاء صيانة", search: "بحث بالكود...", allLines: "كل الخطوط", urgent: "عاجل 🚨", soon: "قريباً", safe: "آمن" },
-        tr: { total: "Toplam", active: "Aktif", repair: "Arıza", stock: "Stok", singer: "Singer", over: "Over", orlay: "Orlay", btnReport: "WP Raporu Gönder", daysLeft: "{n} gün kaldı", daysLate: "{n} gün gecikti", today: "Bugün", optAll: "Tümü", startM: "Başlat", finishM: "Bitir", search: "Kod ara...", allLines: "Tüm Hatlar", urgent: "Acil 🚨", soon: "Yakında", safe: "Güvenلي" }
+        en: { total: "Total", active: "Active", repair: "Repair", stock: "Stock", singer: "Singer", over: "Over", orlay: "Orlay", btnReport: "Send WhatsApp Report", daysLeft: "{n} Days left", daysLate: "{n} Days late", today: "Today", optAll: "Maint: All", startM: "Start Maint", finishM: "Finish Maint", search: "Search code...", allLines: "All Lines", urgent: "Urgent 🚨", soon: "Soon", safe: "Safe", done: "Done", notePh: "Write maintenance summary here..." },
+        ar: { total: "الإجمالي", active: "يعمل", repair: "أعطال", stock: "مخزن", singer: "سنجر", over: "أوفر", orlay: "أورليه", btnReport: "إرسال بلاغ واتساب", daysLeft: "باقي {n} يوم", daysLate: "متأخر {n} يوم", today: "موعد اليوم", optAll: "المواعيد: الكل", startM: "بدء صيانة", finishM: "إنهاء صيانة", search: "بحث بالكود...", allLines: "كل الخطوط", urgent: "عاجل 🚨", soon: "قريباً", safe: "آمن", done: "تم الحفظ", notePh: "اكتب ملخص ما تم إصلاحه هنا..." },
+        tr: { total: "Toplam", active: "Aktif", repair: "Arıza", stock: "Stok", singer: "Singer", over: "Over", orlay: "Orlay", btnReport: "WP Raporu Gönder", daysLeft: "{n} gün kaldı", daysLate: "{n} gün gecikti", today: "Bugün", optAll: "Tümü", startM: "Başlat", finishM: "Bitir", search: "Kod ara...", allLines: "Tüm Hatlar", urgent: "Acil 🚨", soon: "Yakında", safe: "Güvenli", done: "Tamam", notePh: "Özeti buraya yazın..." }
     };
 
-    // --- Login Logic ---
     function checkLogin() {
         const pass = document.getElementById('passInput').value;
         if(pass === "505050") {
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('mainWrapper').style.display = 'block';
-            init(); // ابدأ النظام فقط بعد الباسوورد
+            init();
             sessionStorage.setItem('isAuth', 'true');
         } else {
             document.getElementById('errHint').style.display = 'block';
@@ -245,9 +266,11 @@
 
             if (matchesSearch && matchesStatus && matchesType && matchesMaint && matchesLine) {
                 const card = document.createElement('div');
-                card.className = `machine-card`;
+                card.className = `machine-card ${mState === 'urgent' ? 'urgent-glow' : ''}`;
                 if(query !== '' && mCode === query) card.classList.add('expanded');
-                card.onclick = (e) => { if(!e.target.closest('button')) card.classList.toggle('expanded'); };
+                card.onclick = (e) => { 
+                    if(!e.target.closest('button') && !e.target.closest('textarea')) card.classList.toggle('expanded'); 
+                };
                 
                 let daysTxt = diff === null ? "" : (diff > 0 ? translate('daysLeft', diff) : (diff < 0 ? translate('daysLate', diff) : translate('today')));
                 let daysCls = diff <= 7 ? 'days-urgent' : (diff <= 15 ? 'days-soon' : 'days-safe');
@@ -267,12 +290,18 @@
                     ${diff!==null ? `<span class="days-badge ${daysCls}">${daysTxt}</span>` : ''}
                     <div class="card-body">
                         ${bodyContent}
-                        <div class="maint-actions">
+                        <div class="maint-actions" id="actions-${m.Code}">
                             <button class="btn-start" onclick="handleMaint('${m.Code}', '${m.Location}', '${m.Type}', 'start', this)">
                                 <i class="fas fa-play"></i> ${translate('startM')}
                             </button>
-                            <button class="btn-finish" onclick="handleMaint('${m.Code}', '${m.Location}', '${m.Type}', 'finish', this)">
+                            <button class="btn-finish" onclick="showNoteArea('${m.Code}', '${m.Location}', '${m.Type}', this)">
                                 <i class="fas fa-check"></i> ${translate('finishM')}
+                            </button>
+                        </div>
+                        <div class="note-area" id="noteArea-${m.Code}">
+                            <textarea id="noteInput-${m.Code}" placeholder="${translate('notePh')}"></textarea>
+                            <button class="btn-done" onclick="submitMaintWithNote('${m.Code}', '${m.Location}', '${m.Type}', this)">
+                                ${translate('done')}
                             </button>
                         </div>
                         <button class="whatsapp-btn" onclick="sendWA(${JSON.stringify(m).replace(/"/g, '&quot;')})">
@@ -282,6 +311,28 @@
                 grid.appendChild(card);
             }
         });
+    }
+
+    function showNoteArea(code, loc, type, btn) {
+        document.getElementById(`actions-${code}`).style.display = 'none';
+        document.getElementById(`noteArea-${code}`).style.display = 'block';
+    }
+
+    async function submitMaintWithNote(code, loc, type, btn) {
+        const note = document.getElementById(`noteInput-${code}`).value;
+        const originalText = btn.innerHTML;
+        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors',
+                body: JSON.stringify({ code, location: loc, type, action: 'finish', note: note })
+            });
+            alert("Maint. Finished & Note Saved ✅");
+            document.getElementById(`noteArea-${code}`).style.display = 'none';
+            document.getElementById(`actions-${code}`).style.display = 'grid';
+        } catch (e) { alert("Error!"); }
+        finally { btn.disabled = false; btn.innerHTML = originalText; }
     }
 
     async function handleMaint(code, loc, type, action, btn) {
@@ -312,7 +363,6 @@
         updateUI(); 
     }
 
-    // السماح بالدخول التلقائي إذا تم تسجيل الدخول مسبقاً في نفس الجلسة
     window.onload = () => {
         if(sessionStorage.getItem('isAuth') === 'true') {
             document.getElementById('lockScreen').style.display = 'none';
