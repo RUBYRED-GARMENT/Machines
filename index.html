@@ -41,7 +41,7 @@
         }
         #mainWrapper { display: none; } 
 
-        /* --- Your Original Styles --- */
+        /* --- Global Styles --- */
         body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; transition: 0.3s; }
         .container { max-width: 1200px; margin: auto; }
         .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; position: relative; }
@@ -58,7 +58,6 @@
         select, input { background: var(--card); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 10px; font-family: 'Cairo'; outline: none; flex: 1; min-width: 140px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
         
-        /* --- Glow Effect for Urgent Machines --- */
         .machine-card { background: var(--card); border-radius: 15px; padding: 15px; border: 1px solid var(--border); transition: 0.3s; cursor: pointer; position: relative; }
         .urgent-glow { 
             border: 2px solid var(--red) !important; 
@@ -73,7 +72,7 @@
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .card-body { display: none; margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border); }
         .machine-card.expanded .card-body { display: block; }
-        .days-badge { font-size: 0.7rem; padding: 3px 8px; border-radius: 5px; font-weight: bold; margin-top: 5px; display: inline-block; }
+        .days-badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; font-weight: bold; margin-top: 8px; display: inline-block; }
         .days-urgent { background: var(--red); color: white; }
         .days-soon { background: var(--orange); color: white; }
         .days-safe { background: var(--green); color: white; }
@@ -83,22 +82,29 @@
         .bg-stock { background: rgba(100, 116, 139, 0.2); color: var(--stock); }
         .maint-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; margin-bottom: 10px; }
         
-        /* --- Note Area Styles --- */
         .note-area { display: none; margin-top: 10px; animation: fadeIn 0.3s; }
         .note-area textarea { 
             width: 100%; background: #0f172a; color: white; border: 1px solid var(--singer); 
             border-radius: 8px; padding: 10px; font-family: 'Cairo'; font-size: 0.8rem; resize: none; box-sizing: border-box;
         }
         .btn-done { background: var(--green); color: white; border: none; width: 100%; padding: 8px; border-radius: 8px; margin-top: 5px; font-weight: 700; cursor: pointer; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
+        
         .btn-start { background: var(--orange); color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: 700; font-size: 0.8rem; transition: 0.2s; }
         .btn-finish { background: var(--singer); color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: 700; font-size: 0.8rem; transition: 0.2s; }
-        .btn-start:active, .btn-finish:active { transform: scale(0.95); opacity: 0.8; }
-        .btn-start:disabled, .btn-finish:disabled { background: #444; cursor: not-allowed; }
-        .whatsapp-btn { background: var(--whatsapp); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; width: 100%; font-family: 'Cairo'; }
+        .btn-history { background: #475569; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: 700; font-size: 0.8rem; margin-top: 8px; width: 100%; transition: 0.2s; }
+        .whatsapp-btn { background: var(--whatsapp); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; width: 100%; font-family: 'Cairo'; margin-top: 8px; }
         .detail-item { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .detail-label { color: var(--muted); }
+
+        /* --- Modal Styles --- */
+        .modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
+        .modal-content { background: var(--card); margin: 5% auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 600px; border: 1px solid var(--border); max-height: 85vh; overflow-y: auto; position: relative; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 15px; position: sticky; top: 0; background: var(--card); z-index: 10; }
+        .history-item { background: #0f172a; padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid var(--primary); }
+        [dir="rtl"] .history-item { border-left: none; border-right: 4px solid var(--primary); }
+        .history-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.85rem; }
+        .hist-label { color: var(--muted); font-size: 0.7rem; display: block; margin-bottom: 2px; }
+        .hist-val { font-weight: 600; color: #fff; }
     </style>
 </head>
 <body>
@@ -139,9 +145,20 @@
     </div>
 </div>
 
+<div id="historyModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="historyTitle" style="margin:0"></h3>
+            <button onclick="closeHistory()" style="background:none; border:none; color:white; font-size:1.8rem; cursor:pointer;">&times;</button>
+        </div>
+        <div id="historyList"></div>
+    </div>
+</div>
+
 <script>
     const SHEET_ID = "1p1JEBOFYfCmys864VVBH-qqzByErjSCxdhu-cqT4Grw";
     const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
+    const HISTORY_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=history`;
     const MAINTENANCE_PHONE = "201279552202";
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzEjGwm3AmxAA45TD54sOtwTggluGB2QdutCzH-uYU14KelVIDIN2ciwpY1xWjrvELRWg/exec"; 
 
@@ -151,9 +168,27 @@
     let currentTypeFilter = 'all';
 
     const dictionary = {
-        en: { total: "Total", active: "Active", repair: "Repair", stock: "Stock", singer: "Singer", over: "Over", orlay: "Orlay", btnReport: "Send WhatsApp Report", daysLeft: "{n} Days left", daysLate: "{n} Days late", today: "Today", optAll: "Maint: All", startM: "Start Maint", finishM: "Finish Maint", search: "Search code...", allLines: "All Lines", urgent: "Urgent 🚨", soon: "Soon", safe: "Safe", done: "Done", notePh: "Write maintenance summary here..." },
-        ar: { total: "الإجمالي", active: "يعمل", repair: "أعطال", stock: "مخزن", singer: "سنجر", over: "أوفر", orlay: "أورليه", btnReport: "إرسال بلاغ واتساب", daysLeft: "باقي {n} يوم", daysLate: "متأخر {n} يوم", today: "موعد اليوم", optAll: "المواعيد: الكل", startM: "بدء صيانة", finishM: "إنهاء صيانة", search: "بحث بالكود...", allLines: "كل الخطوط", urgent: "عاجل 🚨", soon: "قريباً", safe: "آمن", done: "تم الحفظ", notePh: "اكتب ملخص ما تم إصلاحه هنا..." },
-        tr: { total: "Toplam", active: "Aktif", repair: "Arıza", stock: "Stok", singer: "Singer", over: "Over", orlay: "Orlay", btnReport: "WP Raporu Gönder", daysLeft: "{n} gün kaldı", daysLate: "{n} gün gecikti", today: "Bugün", optAll: "Tümü", startM: "Başlat", finishM: "Bitir", search: "Kod ara...", allLines: "Tüm Hatlar", urgent: "Acil 🚨", soon: "Yakında", safe: "Güvenli", done: "Tamam", notePh: "Özeti buraya yazın..." }
+        en: { 
+            total: "Total", active: "Active", repair: "Repair", stock: "Stock", singer: "Singer", over: "Over", orlay: "Orlay", 
+            btnReport: "Send WhatsApp Report", daysLeft: "{n} Days left", daysLate: "{n} Days late", today: "Today", 
+            optAll: "Maint: All", startM: "Start Maint", finishM: "Finish Maint", search: "Search code...", allLines: "All Lines", 
+            urgent: "Urgent 🚨", soon: "Soon", safe: "Safe", done: "Done", notePh: "Write maintenance summary here...", 
+            historyBtn: "Maintenance History", hStart: "Start Date", hEnd: "End Date", hDur: "Maintenance Time", hStat: "Status", hNote: "Note", noData: "No records found."
+        },
+        ar: { 
+            total: "الإجمالي", active: "يعمل", repair: "أعطال", stock: "مخزن", singer: "سنجر", over: "أوفر", orlay: "أورليه", 
+            btnReport: "إرسال بلاغ واتساب", daysLeft: "باقي {n} يوم", daysLate: "متأخر {n} يوم", today: "موعد اليوم", 
+            optAll: "المواعيد: الكل", startM: "بدء صيانة", finishM: "إنهاء صيانة", search: "بحث بالكود...", allLines: "كل الخطوط", 
+            urgent: "عاجل 🚨", soon: "قريباً", safe: "آمن", done: "تم الحفظ", notePh: "اكتب ملخص ما تم إصلاحه هنا...", 
+            historyBtn: "سجل التصليحات", hStart: "تاريخ البدء", hEnd: "تاريخ الانتهاء", hDur: "مدة الإصلاح", hStat: "الحالة", hNote: "ملاحظات", noData: "لا توجد سجلات."
+        },
+        tr: { 
+            total: "Toplam", active: "Aktif", repair: "Arıza", stock: "Stok", singer: "Singer", over: "Over", orlay: "Orlay", 
+            btnReport: "WP Raporu Gönder", daysLeft: "{n} gün kaldı", daysLate: "{n} gün gecikti", today: "Bugün", 
+            optAll: "Tümü", startM: "Başlat", finishM: "Bitir", search: "Kod ara...", allLines: "Tüm Hatlar", 
+            urgent: "Acil 🚨", soon: "Yakında", safe: "Güvenli", done: "Tamam", notePh: "Özeti buraya yazın...", 
+            historyBtn: "Bakım Geçmişi", hStart: "Başlangıç", hEnd: "Bitiش", hDur: "Bakım Süresi", hStat: "Durum", hNote: "Not", noData: "Kayıt bulunamadı."
+        }
     };
 
     function checkLogin() {
@@ -180,13 +215,6 @@
                 let obj = {}; headers.forEach((h, i) => obj[h] = row[i]?.trim());
                 return obj;
             }).filter(m => m.Code);
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const codeFromURL = urlParams.get('code');
-            if (codeFromURL) {
-                document.getElementById('searchInput').value = codeFromURL;
-            }
-
             updateUI();
         } catch (e) { console.error("Load Error"); }
     }
@@ -197,8 +225,7 @@
         for(let i=1; i<=30; i++) {
             lineSelect.innerHTML += `<option value="LINE ${i}">LINE ${i}</option>`;
         }
-        const maintSelect = document.getElementById('maintFilter');
-        maintSelect.innerHTML = `
+        document.getElementById('maintFilter').innerHTML = `
             <option value="all">${translate('optAll')}</option>
             <option value="urgent">${translate('urgent')}</option>
             <option value="soon">${translate('soon')}</option>
@@ -255,6 +282,7 @@
             const mStat = (m.Status || "").toLowerCase();
             const mType = (m.Type || "").toLowerCase();
             const mLocation = (m.Location || "").toUpperCase();
+            
             const diff = getDaysDiff(m["Next Maintenance"]);
             let mState = (diff !== null && diff <= 7) ? 'urgent' : (diff !== null && diff <= 15 ? 'soon' : 'safe');
 
@@ -268,6 +296,7 @@
                 const card = document.createElement('div');
                 card.className = `machine-card ${mState === 'urgent' ? 'urgent-glow' : ''}`;
                 if(query !== '' && mCode === query) card.classList.add('expanded');
+                
                 card.onclick = (e) => { 
                     if(!e.target.closest('button') && !e.target.closest('textarea')) card.classList.toggle('expanded'); 
                 };
@@ -277,7 +306,7 @@
                 
                 let bodyContent = "";
                 Object.entries(m).forEach(([k, v]) => {
-                    if(!['Code','Status','Type'].includes(k)) bodyContent += `<div class="detail-item"><span class="detail-label">${k}:</span><span>${v||'-'}</span></div>`;
+                    if(!['Code','Status','Type','Next Maintenance'].includes(k)) bodyContent += `<div class="detail-item"><span class="detail-label">${k}:</span><span>${v||'-'}</span></div>`;
                 });
 
                 card.innerHTML = `
@@ -287,7 +316,9 @@
                     </div>
                     <div style="font-size:0.85rem; font-weight:600">${m.Model || ''}</div>
                     <div style="font-size:0.75rem; color:var(--muted); margin-top:4px"><i class="fas fa-map-marker-alt"></i> ${m.Location || '-'}</div>
-                    ${diff!==null ? `<span class="days-badge ${daysCls}">${daysTxt}</span>` : ''}
+                    
+                    ${diff !== null ? `<span class="days-badge ${daysCls}">${daysTxt}</span>` : ''}
+
                     <div class="card-body">
                         ${bodyContent}
                         <div class="maint-actions" id="actions-${m.Code}">
@@ -304,6 +335,9 @@
                                 ${translate('done')}
                             </button>
                         </div>
+                        <button class="btn-history" onclick="showHistory('${m.Code}')">
+                            <i class="fas fa-history"></i> ${translate('historyBtn')}
+                        </button>
                         <button class="whatsapp-btn" onclick="sendWA(${JSON.stringify(m).replace(/"/g, '&quot;')})">
                             <i class="fab fa-whatsapp"></i> ${translate('btnReport')}
                         </button>
@@ -312,6 +346,44 @@
             }
         });
     }
+
+    async function showHistory(code) {
+        const modal = document.getElementById('historyModal');
+        const list = document.getElementById('historyList');
+        document.getElementById('historyTitle').innerText = `${translate('historyBtn')} #${code}`;
+        list.innerHTML = '<div style="text-align:center; padding:30px;"><i class="fas fa-circle-notch fa-spin fa-2x"></i></div>';
+        modal.style.display = 'block';
+
+        try {
+            const response = await fetch(HISTORY_URL);
+            const text = await response.text();
+            const rows = text.split('\n').map(r => r.split('","').map(c => c.replace(/"/g, '')));
+            const filtered = rows.slice(1).filter(row => row[0]?.trim() === code);
+
+            if(filtered.length === 0) {
+                list.innerHTML = `<p style="text-align:center; padding:20px; color:var(--muted);">${translate('noData')}</p>`;
+                return;
+            }
+
+            list.innerHTML = filtered.reverse().map(row => `
+                <div class="history-item">
+                    <div class="history-grid">
+                        <div><span class="hist-label">${translate('hStart')}</span><span class="hist-val">${row[3] || '-'}</span></div>
+                        <div><span class="hist-label">${translate('hEnd')}</span><span class="hist-val">${row[4] || '-'}</span></div>
+                        <div><span class="hist-label">${translate('hDur')}</span><span class="hist-val" style="color:var(--orange)">${row[5] || '-'}</span></div>
+                        <div><span class="hist-label">${translate('hStat')}</span><span class="hist-val">${row[6] || '-'}</span></div>
+                    </div>
+                    <div style="margin-top:12px; padding-top:10px; border-top:1px solid #1e293b">
+                        <span class="hist-label">${translate('hNote')}</span>
+                        <p style="margin:5px 0 0; font-size:0.9rem; color:var(--muted)">${row[7] || '-'}</p>
+                    </div>
+                </div>
+            `).join('');
+        } catch (e) { list.innerHTML = '<p style="text-align:center; color:var(--red);">Connection Error!</p>'; }
+    }
+
+    function closeHistory() { document.getElementById('historyModal').style.display = 'none'; }
+    window.onclick = (e) => { if(e.target == document.getElementById('historyModal')) closeHistory(); };
 
     function showNoteArea(code, loc, type, btn) {
         document.getElementById(`actions-${code}`).style.display = 'none';
@@ -322,13 +394,9 @@
         const note = document.getElementById(`noteInput-${code}`).value;
         const originalText = btn.innerHTML;
         btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        
         try {
-            await fetch(SCRIPT_URL, {
-                method: 'POST', mode: 'no-cors',
-                body: JSON.stringify({ code, location: loc, type, action: 'finish', note: note })
-            });
-            alert("Maint. Finished & Note Saved ✅");
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ code, location: loc, type, action: 'finish', note: note }) });
+            alert("Success ✅");
             document.getElementById(`noteArea-${code}`).style.display = 'none';
             document.getElementById(`actions-${code}`).style.display = 'grid';
         } catch (e) { alert("Error!"); }
@@ -339,17 +407,14 @@
         const originalText = btn.innerHTML;
         btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         try {
-            await fetch(SCRIPT_URL, {
-                method: 'POST', mode: 'no-cors',
-                body: JSON.stringify({ code, location: loc, type, action })
-            });
-            alert(action === 'start' ? "Maint. Started ✅" : "Maint. Finished ✅");
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ code, location: loc, type, action }) });
+            alert("Success ✅");
         } catch (e) { alert("Error!"); }
         finally { btn.disabled = false; btn.innerHTML = originalText; }
     }
 
     function sendWA(machine) {
-        const text = `🚨 *MAINTENANCE REQUEST*%0A%0A🆔 *Code:* ${machine.Code}%0A📍 *Location:* ${machine.Location || '-'}%0A📦 *Model:* ${machine.Model || '-'}%0A⚙️ *Type:* ${machine.Type || '-'}%0A📅 *Last Service:* ${machine['Last Maintenance'] || '-'}`;
+        const text = `🚨 *MAINTENANCE REQUEST*%0A%0A🆔 *Code:* ${machine.Code}%0A📍 *Location:* ${machine.Location || '-'}%0A⚙️ *Type:* ${machine.Type || '-'}%0A📦 *Model:* ${machine.Model || '-'}`;
         window.open(`https://wa.me/${MAINTENANCE_PHONE}?text=${text}`, '_blank');
     }
 
@@ -363,13 +428,7 @@
         updateUI(); 
     }
 
-    window.onload = () => {
-        if(sessionStorage.getItem('isAuth') === 'true') {
-            document.getElementById('lockScreen').style.display = 'none';
-            document.getElementById('mainWrapper').style.display = 'block';
-            init();
-        }
-    };
+    window.onload = () => { if(sessionStorage.getItem('isAuth') === 'true') { document.getElementById('lockScreen').style.display = 'none'; document.getElementById('mainWrapper').style.display = 'block'; init(); } };
 </script>
 </body>
 </html>
