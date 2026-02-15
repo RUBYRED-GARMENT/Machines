@@ -187,7 +187,7 @@
             btnReport: "WP Raporu Gönder", daysLeft: "{n} gün kaldı", daysLate: "{n} gün gecikti", today: "Bugün", 
             optAll: "Tümü", startM: "Başlat", finishM: "Bitir", search: "Kod ara...", allLines: "Tüm Hatlar", 
             urgent: "Acil 🚨", soon: "Yakında", safe: "Güvenli", done: "Tamam", notePh: "Özeti buraya yazın...", 
-            historyBtn: "Bakım Geçmişi", hStart: "Başlangıç", hEnd: "Bitiش", hDur: "Bakım Süresi", hStat: "Durum", hNote: "Not", noData: "Kayıt bulunamadı."
+            historyBtn: "Bakım Geçmişi", hStart: "Başlangıç", hEnd: "Bitiش", hDur: "Bakım Süresi", hStat: "Durum", hNote: "Not", noData: "Kayıt bulunamadى."
         }
     };
 
@@ -196,6 +196,15 @@
         if(pass === "505050") {
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('mainWrapper').style.display = 'block';
+            
+            // --- تعديل: سحب الكود من الرابط ---
+            const urlParams = new URLSearchParams(window.location.search);
+            const codeFromUrl = urlParams.get('code');
+            if (codeFromUrl) {
+                document.getElementById('searchInput').value = codeFromUrl;
+            }
+            // ---------------------------------
+
             init();
             sessionStorage.setItem('isAuth', 'true');
         } else {
@@ -286,7 +295,10 @@
             const diff = getDaysDiff(m["Next Maintenance"]);
             let mState = (diff !== null && diff <= 7) ? 'urgent' : (diff !== null && diff <= 15 ? 'soon' : 'safe');
 
+            // --- تعديل: مقارنة دقيقة تماماً لمنع تشابه الأرقام (مثل 1 و 10) ---
             let matchesSearch = query === '' || mCode === query;
+            // -------------------------------------------------------------
+            
             let matchesStatus = currentStatusFilter === 'all' || (currentStatusFilter === 'active' && mStat === 'active') || (currentStatusFilter === 'repair' && ['repair', 'down', 'أعطال'].includes(mStat)) || (currentStatusFilter === 'stock' && mStat === 'stock');
             const matchesType = currentTypeFilter === 'all' || mType.includes(currentTypeFilter.toLowerCase());
             const matchesMaint = maintF === 'all' || mState === maintF;
@@ -295,7 +307,9 @@
             if (matchesSearch && matchesStatus && matchesType && matchesMaint && matchesLine) {
                 const card = document.createElement('div');
                 card.className = `machine-card ${mState === 'urgent' ? 'urgent-glow' : ''}`;
-                if(query !== '' && mCode === query) card.classList.add('expanded');
+                
+                // لو في بحث برقم كود معين، خلّي الكارت مفتوح تلقائياً
+                if(query !== '') card.classList.add('expanded');
                 
                 card.onclick = (e) => { 
                     if(!e.target.closest('button') && !e.target.closest('textarea')) card.classList.toggle('expanded'); 
@@ -428,7 +442,21 @@
         updateUI(); 
     }
 
-    window.onload = () => { if(sessionStorage.getItem('isAuth') === 'true') { document.getElementById('lockScreen').style.display = 'none'; document.getElementById('mainWrapper').style.display = 'block'; init(); } };
+    // --- تعديل: عند فتح الصفحة، لو المستخدم مسجل دخول، نفذ checkLogin عشان يسحب الكود من الرابط ---
+    window.onload = () => { 
+        const urlParams = new URLSearchParams(window.location.search);
+        const hasCode = urlParams.has('code');
+
+        if(sessionStorage.getItem('isAuth') === 'true') { 
+            document.getElementById('lockScreen').style.display = 'none'; 
+            document.getElementById('mainWrapper').style.display = 'block'; 
+            
+            if(hasCode) {
+                document.getElementById('searchInput').value = urlParams.get('code');
+            }
+            init(); 
+        } 
+    };
 </script>
 </body>
 </html>
